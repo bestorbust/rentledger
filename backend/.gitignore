@@ -1,0 +1,110 @@
+# ==============================
+# Environment variables / Secrets
+# ==============================
+
+.env
+.env.*
+!.env.example
+
+
+# ==============================
+# Python
+# ==============================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.so
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ==============================
+# Testing / Coverage
+# ==============================
+
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+
+# ==============================
+# Type checking / Linters
+# ==============================
+
+.mypy_cache/
+.pyre/
+.ruff_cache/
+
+
+# ==============================
+# IDE / Editors
+# ==============================
+
+.vscode/
+.idea/
+
+*.swp
+*.swo
+
+# ==============================
+# OS files
+# ==============================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# ==============================
+# Logs
+# ==============================
+
+*.log
+logs/
+
+
+# ==============================
+# Temporary files
+# ==============================
+
+*.tmp
+*.temp
+*.bak
+
+
+# ==============================
+# Generated files
+# ==============================
+
+*.pdf
+uploads/
+generated/
+temp/
+
+
+# ==============================
+# Jupyter
+# ==============================
+
+.ipynb_checkpoints/
+
+
+# ==============================
+# Uvicorn / FastAPI
+# ==============================
+
+uvicorn.log
