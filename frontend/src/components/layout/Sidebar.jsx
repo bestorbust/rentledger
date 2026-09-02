@@ -14,11 +14,11 @@ const navigation = [
     icon: LayoutDashboard,
     path: "/",
   },
-  {
-    name: "Residents",
-    icon: Users,
-    path: "/residents",
-  },
+  // {
+  //   name: "Residents",
+  //   icon: Users,
+  //   path: "/residents",
+  // },
   {
     name: "Receipts",
     icon: ReceiptText,
@@ -78,7 +78,8 @@ function Sidebar({isOpen,setIsOpen}) {
                 onClick={() => navigate(item.path)}
                 title={!isOpen ? item.name : undefined}
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                  location.pathname === item.path
+                  location.pathname === item.path ||
+                  location.pathname.startsWith(`${item.path}/`)
                     ? "bg-[#f9e9e4] text-[#b9563e]"
                     : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
                 } ${!isOpen ? "justify-center" : ""}`}

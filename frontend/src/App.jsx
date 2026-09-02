@@ -8,13 +8,24 @@ import EditTenant from "./pages/EditTenant";
 import ArchivedTenants from "./pages/ArchivedTenants";
 import Receipts from "./pages/Receipts";
 import Settings from "./pages/settings";
-import TenantTable from "./components/tenants/TenantTable";
 import Residents from "./pages/Residents";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+
+        {/* Dashboard */}
+        <Route
+          path="/"
+          element={<Dashboard />}
+        />
+
+        {/* Residents */}
+        <Route
+          path="/residents"
+          element={<Residents />}
+        />
 
         <Route
           path="/residents/new"
@@ -22,39 +33,38 @@ function App() {
         />
 
         <Route
-          path="/residents/:id/receipt"
-          element={<ReceiptGeneration />}
-        />
-
-        <Route
-          path="/receipts/:id/preview"
-          element={<ReceiptPreview />}
-        />
-
-        <Route
           path="/residents/:id/edit"
           element={<EditTenant />}
         />
 
+        {/* Archived Residents */}
         <Route
           path="/archived"
           element={<ArchivedTenants />}
         />
 
+        {/* ================================================= */}
+        {/* RECEIPTS */}
+        {/* ================================================= */}
+
+        {/* Main monthly receipt generation page */}
         <Route
           path="/receipts"
-          element={<Receipts />}
+          element={<ReceiptGeneration />}
         />
 
+        {/* Individual receipt preview */}
+        <Route
+          path="/receipts/:id/preview"
+          element={<ReceiptPreview />}
+        />
+
+        {/* Settings */}
         <Route
           path="/settings"
           element={<Settings />}
         />
 
-        <Route
-          path="/residents"
-          element={<Residents />}
-        />
       </Routes>
     </BrowserRouter>
   );

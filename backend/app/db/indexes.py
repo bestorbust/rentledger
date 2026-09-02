@@ -3,11 +3,9 @@ from app.db.mongodb import get_database
 
 async def create_indexes():
     db = get_database()
-
-    # ============================================================
+ 
     # TENANT INDEXES
-    # ============================================================
-
+ 
     # Used by:
     # GET /api/tenants
     # Find all active tenants and sort by created_at.
@@ -48,9 +46,7 @@ async def create_indexes():
         name="tenants_is_active",
     )
 
-    # ============================================================
     # RECEIPT INDEXES
-    # ============================================================
 
     # Used when checking whether a receipt already exists
     # for a tenant and rent month.
@@ -91,12 +87,6 @@ async def create_indexes():
         name="receipts_receipt_number_unique",
     )
 
-    # ============================================================
-    # COUNTERS INDEX
-    # ============================================================
-
-    # The counters collection uses "_id" as the sequence key.
-    # MongoDB already creates a unique index on "_id",
-    # so no additional index is required here.
+     # COUNTERS INDEX
 
     print("MongoDB indexes created successfully.")

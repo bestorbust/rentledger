@@ -182,22 +182,6 @@ async def restore_tenant(tenant_id: str):
             detail="Tenant not found.",
         )
 
-    # existing_room = await db.tenants.find_one(
-    #     {
-    #         "_id": {"$ne": object_id},
-    #         "room": tenant["room"],
-    #         "is_active": True,
-    #     }
-    # )
-
-    # if existing_room:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_409_CONFLICT,
-    #         detail=(
-    #             f"Room {tenant['room']} is currently occupied "
-    #             "by another active tenant."
-    #         ),
-    #     )
 
     await db.tenants.update_one(
         {"_id": object_id},

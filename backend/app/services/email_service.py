@@ -1,18 +1,27 @@
+import base64
 import os
-import smtplib
-from email.message import EmailMessage
-from dotenv import load_dotenv  # 1. Import load_dotenv
 
-# 2. Load the .env file immediately
-load_dotenv() 
+import httpx
+from dotenv import load_dotenv
 
-# Now these will work
-SMTP_HOST = os.getenv("SMTP_HOST")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USERNAME = os.getenv("SMTP_USERNAME")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-SMTP_FROM_EMAIL = os.getenv("SMTP_FROM_EMAIL")
-SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "Sahana Ladies PG")
+
+load_dotenv()
+
+
+BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+
+SMTP_FROM_EMAIL = os.getenv(
+    "SMTP_FROM_EMAIL"
+)
+
+SMTP_FROM_NAME = os.getenv(
+    "SMTP_FROM_NAME",
+    "Sahana Ladies PG",
+)
+
+BREVO_SEND_URL = (
+    "https://api.brevo.com/v3/smtp/email"
+)
 
 
 async def send_receipt_email(
@@ -21,19 +30,9 @@ async def send_receipt_email(
     receipt_number: str,
     pdf_bytes: bytes,
 ):
-    if not SMTP_HOST:
+    if not BREVO_API_KEY:
         raise RuntimeError(
-            "SMTP_HOST is not configured."
-        )
-
-    if not SMTP_USERNAME:
-        raise RuntimeError(
-            "SMTP_USERNAME is not configured."
-        )
-
-    if not SMTP_PASSWORD:
-        raise RuntimeError(
-            "SMTP_PASSWORD is not configured."
+            "BREVO_API_KEY is not configured."
         )
 
     if not SMTP_FROM_EMAIL:
@@ -41,22 +40,39 @@ async def send_receipt_email(
             "SMTP_FROM_EMAIL is not configured."
         )
 
-    message = EmailMessage()
+    if not recipient:
+        raise RuntimeError(
+            "Recipient email is empty."
+        )
 
-    message["Subject"] = (
-        f"Rent Payment Receipt - "
-        f"{receipt_number}"
-    )
+    if not pdf_bytes:
+        raise RuntimeError(
+            "Receipt PDF is empty."
+        )
 
-    message["From"] = (
-        f"{SMTP_FROM_NAME} "
-        f"<{SMTP_FROM_EMAIL}>"
-    )
+    pdf_base64 = base64.b64encode(
+        pdf_bytes
+    ).decode("utf-8")
 
-    message["To"] = recipient
+    payload = {
+        "sender": {
+            "name": SMTP_FROM_NAME,
+            "email": SMTP_FROM_EMAIL,
+        },
 
-    message.set_content(
-        f"""Dear {resident_name},
+        "to": [
+            {
+                "email": recipient,
+                "name": resident_name,
+            }
+        ],
+
+        "subject": (
+            f"Rent Payment Receipt - "
+            f"{receipt_number}"
+        ),
+
+        "textContent": f"""Dear {resident_name},
 
 Please find attached your rent payment receipt.
 
@@ -68,28 +84,66 @@ Regards,
 Sahana Ladies PG
 Sahana Group
 Bengaluru, Karnataka
-"""
+""",
+
+        "attachment": [
+            {
+                "content": pdf_base64,
+                "name": (
+                    f"{receipt_number}.pdf"
+                ),
+            }
+        ],
+    }
+
+    headers = {
+        "accept": "application/json",
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json",
+    }
+
+    timeout = httpx.Timeout(
+        connect=10.0,
+        read=30.0,
+        write=30.0,
+        pool=10.0,
     )
 
-    message.add_attachment(
-        pdf_bytes,
-        maintype="application",
-        subtype="pdf",
-        filename=f"{receipt_number}.pdf",
-    )
+    async with httpx.AsyncClient(
+        timeout=timeout
+    ) as client:
 
-    with smtplib.SMTP(
-        SMTP_HOST,
-        SMTP_PORT,
-    ) as server:
+        try:
+            response = await client.post(
+                BREVO_SEND_URL,
+                json=payload,
+                headers=headers,
+            )
 
-        server.starttls()
+        except httpx.TimeoutException as exc:
+            raise RuntimeError(
+                "Brevo request timed out while "
+                "sending the email."
+            ) from exc
 
-        server.login(
-            SMTP_USERNAME,
-            SMTP_PASSWORD,
+        except httpx.RequestError as exc:
+            raise RuntimeError(
+                f"Unable to connect to Brevo: {exc}"
+            ) from exc
+
+    if response.status_code >= 400:
+        raise RuntimeError(
+            "Brevo email failed: "
+            f"{response.status_code} "
+            f"{response.text}"
         )
 
-        server.send_message(
-            message
-        )
+    try:
+        result = response.json()
+    except Exception:
+        result = {
+            "raw_response": response.text
+        }
+
+
+    return result

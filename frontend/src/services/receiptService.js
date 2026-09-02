@@ -1,53 +1,86 @@
 import api from "./api";
 
 export const receiptService = {
-  // Get all receipts
-  getAll: async () => {
-    const response = await api.get("/receipts");
-    return response.data;
-  },
-
-  // Get one receipt
-  getById: async (id) => {
-    const response = await api.get(`/receipts/${id}`);
-    return response.data;
-  },
-
-  // Generate receipt
-  generate: async (tenantId, receiptData) => {
-    const response = await api.post("/receipts", {
-      tenant_id: tenantId,
-      payment_date: receiptData.paymentDate,
-      payment_mode: receiptData.paymentMode,
-    });
-
-    return response.data;
-  },
-
-  // Download stored receipt PDF
-  download: async (id) => {
+  async getMonthlyStatus(rentMonth) {
     const response = await api.get(
-      `/receipts/${id}/pdf`,
-      {
-        responseType: "blob",
-      }
+      `/receipts/monthly/${rentMonth}/status`
     );
 
     return response.data;
   },
 
-  // Send receipt PDF through email
-  sendEmail: async (formData) => {
+  async generateAndSend({
+    tenantId,
+    rentMonth,
+    paymentDate,
+    paymentMode,
+    receiptNumber,
+    pdfBlob,
+  }) {
+    const formData = new FormData();
+
+    formData.append(
+      "tenant_id",
+      String(tenantId)
+    );
+
+    formData.append(
+      "rent_month",
+      String(rentMonth)
+    );
+
+    formData.append(
+      "payment_date",
+      String(paymentDate)
+    );
+
+    formData.append(
+      "payment_mode",
+      String(paymentMode)
+    );
+
+    formData.append(
+      "receipt_number",
+      String(receiptNumber)
+    );
+
+    formData.append(
+      "pdf",
+      pdfBlob,
+      `${receiptNumber}.pdf`
+    );
+
+    /*
+     * IMPORTANT:
+     *
+     * Do NOT manually set:
+     *
+     * Content-Type: application/json
+     *
+     * and preferably don't manually set multipart/form-data either.
+     *
+     * Browser/Axios will automatically add:
+     *
+     * multipart/form-data; boundary=...
+     */
+
     const response = await api.post(
-      "/receipts/send-email",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      "/receipts/generate-and-send",
+      formData
+    );
+
+    return response.data;
+  },
+
+  async deleteMonthlyReceipt(
+    tenantId,
+    rentMonth
+  ) {
+    const response = await api.delete(
+      `/receipts/tenant/${tenantId}/month/${rentMonth}`
     );
 
     return response.data;
   },
 };
+

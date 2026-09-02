@@ -126,7 +126,7 @@ function TenantTable() {
                 <td className="px-4 py-4">
                   <div className="relative flex items-center justify-end gap-1">
                     {/* Generate Receipt */}
-                    <button
+                    {/* <button
                       type="button"
                       title="Generate receipt"
                       onClick={() =>
@@ -137,28 +137,51 @@ function TenantTable() {
                       className="flex h-8 w-8 items-center justify-center rounded-md text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900"
                     >
                       <FileText size={16} />
-                    </button>
+                    </button> */}
+                    <button
+                          type="button"
+                          onClick={() => {
+                            setOpenMenu(null);
+                            navigate(
+                              `/residents/${tenant.id}/edit`
+                            );
+                          }}
+                          className="flex h-8 w-8 items-center justify-center rounded-md text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900"
+                    >
+                          <Pencil size={15} />
+                          
+                        </button>
 
                     {/* WhatsApp */}
-                    <button
+                    {/* <button
                       type="button"
                       title="WhatsApp"
                       className="flex h-8 w-8 items-center justify-center rounded-md text-neutral-500 transition hover:bg-[#e8f7ed] hover:text-[#168a45]"
                     >
                       <MessageCircle size={16} />
-                    </button>
+                    </button> */}
 
                     {/* Email */}
-                    <button
+                    {/* <button
                       type="button"
                       title="Email"
                       className="flex h-8 w-8 items-center justify-center rounded-md text-neutral-500 transition hover:bg-blue-50 hover:text-blue-600"
                     >
                       <Mail size={16} />
-                    </button>
+                    </button> */}
+                    <button
+                          type="button"
+                          onClick={() =>
+                            handleDeactivate(tenant)
+                          }
+                          className="flex  items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                        >
+                          <Archive size={15} />
+                          Deactivate
+                        </button>
 
                     {/* More */}
-                    <button
+                    {/* <button
                       type="button"
                       title="More"
                       onClick={() =>
@@ -171,7 +194,7 @@ function TenantTable() {
                       className="ml-1 flex h-8 w-8 items-center justify-center rounded-md text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800"
                     >
                       <MoreHorizontal size={18} />
-                    </button>
+                    </button> */}
 
                     {/* Dropdown */}
                     {openMenu === tenant.id && (

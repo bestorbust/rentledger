@@ -10,10 +10,12 @@ class Settings(BaseSettings):
 
     frontend_url: str = "http://localhost:5173"
 
-    smtp_host: str = "smtp.gmail.com"
-    smtp_port: int = 587
-    smtp_username: str
-    smtp_password: str
+    brevo_api_key: str
+
+    # smtp_host: str = "smtp.gmail.com"
+    # smtp_port: int = 587
+    # smtp_username: str
+    # smtp_password: str
     smtp_from_email: str
     smtp_from_name: str = "Sahana Ladies PG"
 
